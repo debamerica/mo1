@@ -1,3 +1,5 @@
+
+
 import pickle
 import streamlit as st
 import requests
@@ -11,11 +13,19 @@ load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 def fetch_poster(movie_id):
+    # Use the TMDB_API_KEY from the environment variable
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&language=en-US"
     data = requests.get(url)
     data = data.json()
-    poster_path = data['poster_path']
-    full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
+
+    # Check if 'poster_path' exists in the response
+    if 'poster_path' in data and data['poster_path'] is not None:
+        poster_path = data['poster_path']
+        full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
+    else:
+        # Provide a default placeholder image if no poster is available
+        full_path = "https://via.placeholder.com/500x750?text=No+Image+Available"
+
     return full_path
 
 def recommend(movie):
@@ -36,8 +46,8 @@ st.title('🎥 Movie Recommender System')
 
 # Sidebar for movie selection
 st.sidebar.header('Select a Movie')
-# movies = pickle.load(open('recommendation_system-movies/movie_list.pkl', 'rb'))
-# similarity = pickle.load(open('recommendation_system-movies/similarity.pkl', 'rb'))
+
+# Load the movies and similarity data from the pickle files
 movies = pickle.load(open('movie_list1.pkl', 'rb'))
 similarity = pickle.load(open('similarity1.pkl', 'rb'))
 
